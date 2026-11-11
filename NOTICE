@@ -1,0 +1,9 @@
+This repository contains a modified sample of the OWASP Benchmark for Java,
+https://github.com/OWASP-Benchmark/BenchmarkJava, commit a0f07b8451902de4e3ff37aa03e40f4aeb3b4dbe,
+licensed under the GNU General Public License v2.0 (see LICENSE).
+
+Changes made on 2026-10-26: 176 of the test cases and the helper classes and resources
+they use were selected; classes, packages and servlet paths renamed; project names and
+some string constants replaced; comments removed (line numbers kept); a minimal pom.xml
+written; git history replaced. The script that makes these changes is
+vulnbench/java/build.py in vulnbench-eval.

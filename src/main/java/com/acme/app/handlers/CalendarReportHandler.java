@@ -1,0 +1,120 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+package com.acme.app.handlers;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet(value = "/h/CalendarReportHandler")
+public class CalendarReportHandler extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doPost(request, response);
+    }
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+
+        String param = "";
+        if (request.getHeader("CalendarReportHandler") != null) {
+            param = request.getHeader("CalendarReportHandler");
+        }
+
+        
+        param = java.net.URLDecoder.decode(param, "UTF-8");
+
+        String bar = doSomething(request, param);
+
+        com.acme.app.support.LDAPManager ads = new com.acme.app.support.LDAPManager();
+        try {
+            response.setContentType("text/html;charset=UTF-8");
+            javax.naming.directory.DirContext ctx = ads.getDirContext();
+            String base = "ou=users,ou=system";
+            javax.naming.directory.SearchControls sc = new javax.naming.directory.SearchControls();
+            sc.setSearchScope(javax.naming.directory.SearchControls.SUBTREE_SCOPE);
+            String filter = "(&(objectclass=person)(uid=" + bar + "))";
+            boolean found = false;
+            javax.naming.NamingEnumeration<javax.naming.directory.SearchResult> results =
+                    ctx.search(base, filter, sc);
+            while (results.hasMore()) {
+                javax.naming.directory.SearchResult sr =
+                        (javax.naming.directory.SearchResult) results.next();
+                javax.naming.directory.Attributes attrs = sr.getAttributes();
+
+                javax.naming.directory.Attribute attr = attrs.get("uid");
+                javax.naming.directory.Attribute attr2 = attrs.get("street");
+                if (attr != null) {
+                    response.getWriter()
+                            .println(
+                                    "LDAP query results:<br>"
+                                            + "Record found with name "
+                                            + org.acme
+                                                    .esapi
+                                                    .ESAPI
+                                                    .encoder()
+                                                    .encodeForHTML(attr.get().toString())
+                                            + "<br>Address: "
+                                            + org.acme
+                                                    .esapi
+                                                    .ESAPI
+                                                    .encoder()
+                                                    .encodeForHTML(attr2.get().toString())
+                                            + "<br>");
+                    found = true;
+                }
+            }
+            if (!found) {
+                response.getWriter()
+                        .println(
+                                "LDAP query results: nothing found for query: "
+                                        + org.owasp.esapi.ESAPI.encoder().encodeForHTML(filter));
+            }
+        } catch (javax.naming.NamingException e) {
+            throw new ServletException(e);
+        } finally {
+            try {
+                ads.closeDirContext();
+            } catch (Exception e) {
+                throw new ServletException(e);
+            }
+        }
+    } 
+
+    private static String doSomething(HttpServletRequest request, String param)
+            throws ServletException, IOException {
+
+        String bar;
+
+        
+        int num = 86;
+        if ((7 * 42) - num > 200) bar = "the_quick_brown_fox_jumps";
+        else bar = param;
+
+        return bar;
+    }
+}
